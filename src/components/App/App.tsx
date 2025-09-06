@@ -1,35 +1,83 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
+import { useState } from 'react'
+import SearchBar from "../SearchBar/SearchBar"
+import MovieGrid from '../MovieGrid/MovieGrid';
+import type { Movie } from '../../types/movie';
+import { fetchMovies } from '../../services/movieService';
+import toast, { Toaster } from 'react-hot-toast';
+import MovieModal from '../MovieModal/MovieModal';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import Loader from '../Loader/Loader';
+
 
 function App() {
+ 
   // const [count, setCount] = useState(0)
+
+// 1. Оголошуємо і типізуємо стан
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [errorMessage, setErrorMessage] = useState(false);
+  const [isLoader, setLoader] = useState(false)
+
+  // useEffect(() => {setLoader(true)}, [])
+
+
+  const handleMovieClick = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setIsModalOpen(true);
+  };
+  const notifyQuery = () => toast.error('No movies found for your request.');
+  const handleSearch = async (topic: string) => {
+    setErrorMessage(false)
+    
+    try {
+      setLoader(true)
+      const data = await fetchMovies(topic);
+
+      setMovies(data);
+      if (data.length === 0) {
+        setLoader(false);
+        notifyQuery();        
+        return;
+      }
+     setLoader(false)
+    } catch {
+      setLoader(true);
+      setErrorMessage(true);
+      setLoader(false);
+    }
+    finally {
+      setLoader(false)
+    }
+  }
 
   return (
     <>
-      {/* <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
+      <SearchBar onSubmit={handleSearch} />
+      {isLoader && <Loader />}
+        <Toaster />
+      {movies.length > 0 && <MovieGrid items={movies}
+        onSelect={handleMovieClick}
+      />}
+      {errorMessage && <ErrorMessage />}
+      {isModalOpen && selectedMovie && (<MovieModal movie={selectedMovie} onClose={() => setIsModalOpen(false)} />)}
+
+     
     </>
   )
 }
 
 export default App
+
+
+
+
+  // return (
+  //   <div>
+  //     <h1>Main content of the page</h1>
+  //     <button onClick={openModal}>Open modal</button>
+  //     {isModalOpen && <Modal onClose={closeModal} />}
+  //   </div>
+  // );
