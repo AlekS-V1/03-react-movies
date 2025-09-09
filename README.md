@@ -1,69 +1,397 @@
-# React + TypeScript + Vite
+У кожній папці компонента мають бути:
+файл компонента з розширенням .tsx (наприклад, App.tsx);
+файл стилів, назва якого закінчується на .module.css, з такою самою назвою (наприклад, App.module.css).
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+Для експорту компонентів використовується експорт за замовчуванням (export default).
+Загальні типи, які використовуються в кількох компонентах, винесені в окремий файл (src/types/movie.ts). Типи та інтерфейси, які стосуються лише одного компонента, оголошені безпосередньо у файлі цього компонента.
+Для типізації пропсів компонентів використовується interface.
+Інтерфейс для пропсів компонента називається за схемою: Ім’яКомпонентаProps (наприклад, UserCardProps).
+Усі події компонентів типізовані.
+Для виконання HTTP-запитів використовується бібліотека axios.
+TypeScript-код має бути чистим, зрозумілим і відформатованим за допомогою Prettier.
+Стилізація виконується за допомогою CSS-модулів.
+Використовується modern-normalize для уніфікації стилів у різних браузерах.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+Пошук фільмів
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+Напиши застосунок пошуку фільмів за ключовим словом. Подивіться демо-відео роботи застосунку.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
+
+
+
+
+Сервіс пошуку фільмів TMDB
+
+
+
+У цьому завданні, за допомогою HTTP-запитів, ви будете отримувати інформацію про фільми з сервісу TMDB.
+
+
+
+Ось відео в якому показано як зареєструвати додаток і отримати персональний ключ доступу.
+
+
+
+
+
+
+
+Не зберігайте токен доступу в коді, використовуй для цього змінну оточення VITE_TMDB_TOKEN.
+
+
+Корисні для вас розділи документації:
+
+Як створити повний шлях до зображення
+Як додати токен доступу до запитів
+Пошук фільмів за ключовим словом
+
+
+Щоб додати токен авторизації до Axios-запиту, потрібно вказати його у заголовках (headers) під час виклику методів axios. Твій config object для аксіоса буде виглядати наступним чином:
+
+
+
+{
+  params: {
+    // твої параметри
   },
-])
-```
+  headers: {
+    Authorization: `Bearer твійТокен`,
+  }
+}
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Відповідь від бекенда приходить об'єктом із всією необхідною інформацією, в тому числі масивом фільмів. Кожен фільм в масиві представлений об'єктом із великою кількістю інформації.
+
+
+
+Ось як буде виглядати інтерфейс для типізації одного фільму. Винесіть його у файл src/types/movie.ts і використовуйте у компонентах.
+
+
+
+export interface Movie {
+    id: number;
+    poster_path: string;
+    backdrop_path: string;
+    title: string;
+    overview: string;
+    release_date: string;
+    vote_average: number;
+}
+
+
+
+Функцію fetchMovies для виконання HTTP-запитів винесіть в окремий файл src/services/movieService.ts. Типізуйте її параметри, результат, який вона повертає, та відповідь від Axios.
+
+
+
+Компоненти
+
+
+
+У цьому завданні вам потрібно самостійно створити та реалізувати логіку наступних компонентів.
+
+
+
+
+
+
+Стилі для всіх компонентів вже створені. Скопіюй їх із цього репозиторію: https://github.com/goitacademy/react-movies-styles. Після створення своїх компонентів скопіюй відповідні .module.css файли у відповідні папки в src/components.
+
+
+Хедер з формою пошуку SearchBar
+
+
+
+Компонент SearchBar приймає один пропс onSubmit – функцію для передачі значення інпуту під час сабміту форми.
+
+
+
+Компонент SearchBar має створювати DOM-елемент наступної структури:
+
+
+
+<header className={styles.header}>
+  <div className={styles.container}>
+    <a
+      className={styles.link}
+      href="https://www.themoviedb.org/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Powered by TMDB
+    </a>
+    <form className={styles.form}>
+      <input
+        className={styles.input}
+        type="text"
+        name="query"
+        autoComplete="off"
+        placeholder="Search movies..."
+        autoFocus
+      />
+      <button className={styles.button} type="submit">
+        Search
+      </button>
+    </form>
+  </div>
+</header>
+
+
+
+Обробка форми має бути реалізована через Form Actions.
+
+
+
+Якщо під час натискання кнопки відправки форми текстове поле порожнє, покажіть користувачеві сповіщення про те, що необхідно ввести текст для пошуку зображень.
+
+
+
+Please enter your search query.
+
+
+
+Ця перевірка виконується в SearchBar в момент відправки форми. Для сповіщень використовуйте бібліотеку React Hot Toast.
+
+
+
+Якщо в результаті запиту масив фільмів порожній, виводьте повідомлення:
+
+
+
+No movies found for your request.
+
+
+
+Ця перевірка виконується в App при обробці HTTP-запиту. Для сповіщень використовуйте бібліотеку React Hot Toast.
+
+
+
+При кожному новому пошуку колекція фільмів з попереднього пошуку повинна очищатись.
+
+
+
+Галерея фільмів MovieGrid
+
+
+
+Компонент MovieGrid – це список карток фільмів. Він приймає два пропси:
+
+onSelect – функцію для обробки кліку на картку фільму;
+movies – масив фільмів.
+Компонент MovieGrid має створювати DOM-елемент наступної структури:
+
+
+
+<ul className={css.grid}>
+  {/* Набір елементів списку з фільмами */}
+  <li>
+    <div className={css.card}>
+      <img 
+		    className={css.image} 
+		    src="https://image.tmdb.org/t/p/w500/poster-path" 
+		    alt="movie title" 
+		    loading="lazy" 
+		  />
+	    <h2 className={css.title}>Movie title</h2>
+    </div>
+  </li>
+</ul>
+
+
+
+Галерея повинна рендеритися лише тоді, коли є які-небудь завантажені фільми.
+
+
+Індикатор завантаження Loader
+
+
+
+Компонент Loader має відображатись замість галереї поки відбувається запит за фільмами та створювати DOM-елемент наступної структури:
+
+
+
+<p className={css.text}>Loading movies, please wait...</p>
+
+
+
+Повідомлення про помилку ErrorMessage
+
+
+
+Компонент ErrorMessage має рендеритись замість галереї фільмів у випадку помилки HTTP-запиту та створювати DOM-елемент наступної структури:
+
+
+
+<p className={css.text}>There was an error, please try again...</p>
+
+
+
+Модальне вікно MovieModal
+
+
+
+Під час натискання на зображення галереї повинно відкриватися модальне вікно, яке відображатиме додаткову інформацію про фільм у великому форматі. Створіть для цього компонент MovieModal. Він має використовуватись в компоненті App та отримувати два пропси:
+
+movie - посилання на об’єкт обраного фільма;
+onClose - функцію закриття модального вікна.
+Компонент MovieModal має створювати DOM-елемент наступної структури:
+
+
+
+<div className={css.backdrop} role="dialog" aria-modal="true">
+  <div className={css.modal}>
+    <button className={css.closeButton} aria-label="Close modal">
+      &times;
+    </button>
+    <img
+      src="https://image.tmdb.org/t/p/original/backdrop_path"
+      alt="movie_title"
+      className={css.image}
+    />
+    <div className={css.content}>
+      <h2>movie_title</h2>
+      <p>movie_overview</p>
+      <p>
+        <strong>Release Date:</strong> movie_release_date
+      </p>
+      <p>
+        <strong>Rating:</strong> movie_vote_average/10
+      </p>
+    </div>
+  </div>
+</div>
+
+
+
+Модальне вікно має створюватись через createPortal, щоб рендерити модалку поза межами основного дерева компонентів. Воно має закриватись при кліку на кнопку з хрестиком, натисканні на клавішу ESC та при кліку за межами модального вікна. За допомогою стилів забороніть скролінг тіла сторінки, поки модалка відкрита.
+
+
+Результати
+Завдання вирішено правильно (файл movie)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Інтерфейс Movie коректно визначений з усіма необхідними властивостями.
+Усі властивості мають правильні типи.
+Інтерфейс коректно експортовано.
+Файл містить лише визначення та експорт для Movie, без зайвого коду.
+Остаточне рішення:
+
+Завдання прийнято
+
+
+Завдання вирішено правильно (файл movieService)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Коректне використання axios з явним дженерик типом для типобезпечності.
+Функція приймає параметр пошукового запиту та повертає лише релевантні дані (Movie[]).
+Bearer токен отримується з змінної оточення та включається в заголовок Authorization.
+Інтерфейс Movie імпортується, а не оголошується локально, і інтерфейс відповіді визначається згідно з вимогами.
+Фінальне рішення:
+
+Завдання прийнято
+
+
+Завдання вирішено правильно (файл SearchBar)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Коректне використання React Form Actions API з атрибутом action на <form>.
+Правильне отримання та приведення типу значення query з об'єкта FormData.
+Повідомлення про помилку відображається за допомогою react-hot-toast, якщо рядок пошуку порожній.
+Проп onSubmit викликається з рядком пошуку, якщо він не порожній.
+Усі змінні та параметри функцій мають правильні типи, і використання приведення типів є безпечним.
+Остаточне рішення:
+
+Завдання було прийнято
+
+
+Завдання вирішено правильно (файл MovieGrid)
+
+Добре виконані аспекти:
+
+Компонент правильно названий та експортований.
+Коректне використання CSS-модулів для стилізації.
+Функція onSelect викликається з правильним об’єктом фільму при кліку на картку.
+Усі змінні та параметри функцій явно типізовані.
+Тип Movie імпортовано та використано належним чином.
+Остаточне рішення:
+
+Завдання прийнято
+
+
+Завдання вирішено правильно (файл MovieModal)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Коректне використання React Portal (createPortal) для рендерингу модального вікна.
+Правильне керування обробником події натискання клавіші Escape та його очищення в useEffect.
+Блокування та відновлення прокрутки сторінки під час відкриття модального вікна реалізовано належним чином.
+Усі пропси та параметри обробників подій явно типізовані, без використання any.
+Модалка закривається за допомогою кнопки закриття, кліку по підкладці та клавіші Escape відповідно до вимог.
+Фінальне рішення:
+
+Завдання прийнято
+
+
+Завдання вирішено правильно (файл Loader)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Компонент реалізований як функціональний компонент з використанням TypeScript.
+Для стилізації використано CSS Modules, що забезпечує інкапсуляцію стилів.
+Повідомлення про завантаження є зрозумілим і зручним для користувача.
+Код чистий і легкий для читання.
+Остаточне рішення:
+
+Завдання було прийнято
+
+
+Завдання вирішено правильно (файл ErrorMessage)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Компонент відображає повідомлення про помилку, як цього вимагається.
+Використання CSS-модуля для стилювання реалізовано коректно.
+Код чистий і лаконічний.
+Фінальне рішення:
+
+Завдання прийнято
+
+
+Завдання вирішено правильно (файл App)
+
+Завдання прийнято
+
+Добре виконані аспекти:
+
+Коректне використання імпортованого типу Movie та функції fetchMovies.
+Всі змінні стану мають правильні типи, використано useState<Movie[]> та useState<Movie | null>.
+Головний компонент названо App та безпосередньо рендериться Toaster.
+Обробники для вибору фільму та закриття модального вікна реалізовано відповідно до вимог.
+Логіка пошуку скидає стан помилки, обробляє завантаження та відображає toast-повідомлення, якщо фільми не знайдено.
+Стани помилки та завантаження обробляються і рендеряться за допомогою компонентів ErrorMessage та Loader.
+Логіка, притаманна окремим компонентам, не обробляється в App, дотримано принципу розділення відповідальностей.
+Фінальне рішення:
+
+Завдання прийнято
+
+Коли модалка закривається, потрібно обов’язково чистити все, що було змінено чи додано під час її відкриття. Це включає очищення стану обраного фільму, видалення слухачів подій для клавіші Escape та відновлення прокручування тіла сторінки.
